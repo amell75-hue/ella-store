@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>ELLA'S - Loja Virtual</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">ELLA'S</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="#" id="nav-gostos">Gostos</a></li>
+                <li><a href="#" id="nav-carrinho">
+                    Carrinho <span id="cart-count">0</span>
+                </a></li>
+                <li><a href="login.html" id="nav-login">Entrar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Produtos em Destaque</h1>
+        <div id="loading">A carregar produtos...</div>
+        <div class="product-feed" id="product-feed"></div>
+    </main>
+
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>O Teu Carrinho</h2>
+            <div id="cart-items"></div>
+            <p>Total: <strong id="cart-total">0.00€</strong></p>
+            <button id="checkout-btn">Finalizar Compra</button>
+            <button id="close-cart">Fechar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>ELLA'S Store — Todos os direitos reservados</p>
+        <p><a href="#">Política de Privacidade</a> |
+           <a href="#">Termos e Condições</a> |
+           <a href="#">Contacto</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
