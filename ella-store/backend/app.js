@@ -10,6 +10,7 @@ const productRoutes = require('./routes/products');
 const orderRoutes   = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
 const webhookRoutes = require('./routes/webhook');
+const goRoutes       = require('./routes/go');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,8 +35,6 @@ app.use('/api/auth/', rateLimit({
     message: { error: 'Demasiadas tentativas de login' }
 }));
 
-// IMPORTANTE: o webhook do Stripe precisa do corpo em formato RAW,
-// por isso é registado antes do express.json() global.
 app.use('/api/payments/webhook', webhookRoutes);
 
 app.use(express.json({ limit: '10kb' }));
@@ -46,6 +45,7 @@ app.use('/api/auth',     authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders',   orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/go', goRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

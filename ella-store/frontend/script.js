@@ -2,6 +2,10 @@ const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api'
     : 'https://SUBSTITUIR-PELO-TEU-BACKEND-EM-PRODUCAO.com/api';
 
+const SITE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://SUBSTITUIR-PELO-TEU-BACKEND-EM-PRODUCAO.com';
+
 let cart = JSON.parse(localStorage.getItem('ella_cart') || '[]');
 
 function sanitize(str) {
@@ -40,20 +44,26 @@ function renderProducts(products) {
         const price = parseFloat(product.price).toFixed(2);
         const image = sanitize(product.image || 'images/placeholder.jpg');
         const desc  = sanitize(product.description || '');
+        const isAffiliate = product.product_type === 'affiliate';
+
+        const botao = isAffiliate
+            ? `<a class="add-cart-btn" href="${SITE_URL}/go/${sanitize(product.slug || '')}" target="_blank" rel="noopener sponsored">Ver Produto</a>
+               <p class="affiliate-note">🔗 Link de afiliado</p>`
+            : `<button class="add-cart-btn" data-id="${product.id}" data-name="${name}" data-price="${price}">
+                Adicionar ao Carrinho
+               </button>`;
 
         div.innerHTML = `
             <img src="${image}" alt="${name}" onerror="this.src='images/placeholder.jpg'">
             <h2>${name}</h2>
             <p class="desc">${desc}</p>
             <p class="price">${price}€</p>
-            <button class="add-cart-btn" data-id="${product.id}" data-name="${name}" data-price="${price}">
-                Adicionar ao Carrinho
-            </button>
+            ${botao}
         `;
         feed.appendChild(div);
     });
 
-    document.querySelectorAll('.add-cart-btn').forEach(btn => {
+    document.querySelectorAll('.add-cart-btn[data-id]').forEach(btn => {
         btn.addEventListener('click', () => {
             addToCart({ id: btn.dataset.id, name: btn.dataset.name, price: parseFloat(btn.dataset.price) });
         });
