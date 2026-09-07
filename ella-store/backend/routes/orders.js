@@ -11,6 +11,8 @@ router.post('/', authRequired, async (req, res) => {
         }
 
         let total = 0;
+        const precosVerificados = [];
+
         for (const item of items) {
             const [rows] = await db.query(
                 'SELECT price FROM products WHERE id = ? AND active = 1',
@@ -19,7 +21,9 @@ router.post('/', authRequired, async (req, res) => {
             if (rows.length === 0) {
                 return res.status(400).json({ error: `Produto ${item.product_id} não existe` });
             }
-            total += rows[0].price * item.quantity;
+            const precoReal = rows[0].price;
+            total += precoReal * item.quantity;
+            precosVerificados.push({ product_id: item.product_id, quantity: item.quantity, price: precoReal });
         }
 
         const [result] = await db.query(
@@ -28,7 +32,7 @@ router.post('/', authRequired, async (req, res) => {
         );
         const orderId = result.insertId;
 
-        for (const item of items) {
+        for (const item of precosVerificados) {
             await db.query(
                 'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
                 [orderId, item.product_id, item.quantity, item.price]
