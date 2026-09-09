@@ -8,6 +8,8 @@ const SITE_URL = window.location.hostname === 'localhost'
 
 let cart = JSON.parse(localStorage.getItem('ella_cart') || '[]');
 let categoriaAtiva = null;
+let termoPesquisa = '';
+let debounceTimer = null;
 
 function sanitize(str) {
     const div = document.createElement('div');
@@ -56,10 +58,11 @@ async function fetchProducts() {
     loading.style.display = 'block';
     loading.textContent = 'A carregar produtos...';
     try {
-        let url = `${API_URL}/products`;
-        if (categoriaAtiva) {
-            url += `?category=${encodeURIComponent(categoriaAtiva)}`;
-        }
+        const params = new URLSearchParams();
+        if (categoriaAtiva) params.set('category', categoriaAtiva);
+        if (termoPesquisa) params.set('search', termoPesquisa);
+
+        const url = `${API_URL}/products${params.toString() ? '?' + params.toString() : ''}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('Erro na resposta');
         const { data } = await res.json();
@@ -76,7 +79,7 @@ function renderProducts(products) {
     feed.innerHTML = '';
 
     if (products.length === 0) {
-        feed.innerHTML = '<p>Sem produtos disponíveis nesta categoria.</p>';
+        feed.innerHTML = '<p>Sem produtos encontrados.</p>';
         return;
     }
 
@@ -116,6 +119,15 @@ function renderProducts(products) {
         });
     });
 }
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const valor = e.target.value.trim();
+    debounceTimer = setTimeout(() => {
+        termoPesquisa = valor;
+        fetchProducts();
+    }, 400);
+});
 
 function addToCart(product) {
     const existing = cart.find(i => i.id === product.id);

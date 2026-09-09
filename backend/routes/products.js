@@ -12,7 +12,7 @@ const CAMPOS = `
 
 router.get('/', async (req, res) => {
     try {
-        const { type, category } = req.query;
+        const { type, category, search } = req.query;
         let sql = `
             SELECT ${CAMPOS}
             FROM products p
@@ -29,6 +29,12 @@ router.get('/', async (req, res) => {
         if (category) {
             sql += ' AND c.slug = ?';
             params.push(category);
+        }
+
+        if (search) {
+            sql += ' AND (p.name LIKE ? OR p.description LIKE ?)';
+            const termo = `%${search}%`;
+            params.push(termo, termo);
         }
 
         sql += ' ORDER BY p.id DESC';
