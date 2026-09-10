@@ -17,7 +17,7 @@ async function carregarProdutoIndividual() {
         loading.classList.add('hidden');
         container.classList.remove('hidden');
 
-        document.title = `${produto.name} - ELLA'S`;
+        preencherSEO(produto);
 
         const isAffiliate = produto.product_type === 'affiliate';
         const price = parseFloat(produto.price).toFixed(2);
@@ -61,6 +61,51 @@ async function carregarProdutoIndividual() {
         loading.textContent = 'Produto não encontrado.';
         console.error(error);
     }
+}
+
+function preencherSEO(produto) {
+    const nome = produto.name;
+    const preco = parseFloat(produto.price).toFixed(2);
+    const descricao = produto.description || `${nome} disponível na ELLA'S Store`;
+    const imagem = produto.image || '';
+    const url = `${SITE_URL_FRONTEND()}/produto.html?id=${produto.id}`;
+
+    document.getElementById('page-title').textContent = `${nome} - ELLA'S Store`;
+    document.getElementById('meta-description').setAttribute('content', descricao.substring(0, 160));
+    document.getElementById('canonical-link').setAttribute('href', url);
+
+    document.getElementById('og-title').setAttribute('content', nome);
+    document.getElementById('og-description').setAttribute('content', descricao.substring(0, 200));
+    document.getElementById('og-image').setAttribute('content', imagem);
+    document.getElementById('og-url').setAttribute('content', url);
+
+    document.getElementById('twitter-title').setAttribute('content', nome);
+    document.getElementById('twitter-description').setAttribute('content', descricao.substring(0, 200));
+    document.getElementById('twitter-image').setAttribute('content', imagem);
+
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": nome,
+        "description": descricao,
+        "image": imagem,
+        "offers": {
+            "@type": "Offer",
+            "url": url,
+            "priceCurrency": "EUR",
+            "price": preco,
+            "availability": produto.product_type === 'own'
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock"
+        }
+    };
+    document.getElementById('schema-produto').textContent = JSON.stringify(schema);
+}
+
+function SITE_URL_FRONTEND() {
+    return window.location.hostname === 'localhost'
+        ? window.location.origin
+        : 'https://ellasstore.com';
 }
 
 updateCartCount();
