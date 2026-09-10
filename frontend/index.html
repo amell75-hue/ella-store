@@ -10,12 +10,13 @@
 <body>
     <header>
         <div class="logo">ELLA'S</div>
-        <nav>
-            <ul>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">☰</button>
+        <nav aria-label="Navegação principal">
+            <ul id="nav-list">
                 <li><a href="index.html">Início</a></li>
                 <li><a href="#" id="nav-gostos">Gostos</a></li>
-                <li><a href="#" id="nav-carrinho">
-                    Carrinho <span id="cart-count">0</span>
+                <li><a href="#" id="nav-carrinho" aria-label="Ver carrinho de compras">
+                    Carrinho <span id="cart-count" aria-live="polite">0</span>
                 </a></li>
                 <li><a href="login.html" id="nav-login">Entrar</a></li>
             </ul>
@@ -25,20 +26,21 @@
     <main>
         <h1>Produtos em Destaque</h1>
         <div class="search-bar">
-            <input type="text" id="search-input" placeholder="🔎 Procurar produtos...">
+            <label for="search-input" class="sr-only">Procurar produtos</label>
+            <input type="text" id="search-input" placeholder="🔎 Procurar produtos..." aria-label="Procurar produtos">
         </div>
-        <div id="category-filters" class="category-filters"></div>
-        <div id="loading">A carregar produtos...</div>
+        <div id="category-filters" class="category-filters" role="group" aria-label="Filtrar por categoria"></div>
+        <div id="loading" role="status" aria-live="polite">A carregar produtos...</div>
         <div class="product-feed" id="product-feed"></div>
     </main>
 
-    <div id="cart-modal" class="modal hidden">
+    <div id="cart-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
         <div class="modal-content">
-            <h2>O Teu Carrinho</h2>
+            <h2 id="cart-title">O Teu Carrinho</h2>
             <div id="cart-items"></div>
             <p>Total: <strong id="cart-total">0.00€</strong></p>
             <button id="checkout-btn">Finalizar Compra</button>
-            <button id="close-cart">Fechar</button>
+            <button id="close-cart" aria-label="Fechar carrinho">Fechar</button>
         </div>
     </div>
 

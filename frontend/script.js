@@ -17,6 +17,15 @@ function sanitize(str) {
     return div.innerHTML;
 }
 
+const menuToggle = document.getElementById('menu-toggle');
+const navList = document.getElementById('nav-list');
+if (menuToggle && navList) {
+    menuToggle.addEventListener('click', () => {
+        const aberto = navList.classList.toggle('aberto');
+        menuToggle.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    });
+}
+
 async function fetchCategories() {
     try {
         const res = await fetch(`${API_URL}/categories`);
@@ -37,9 +46,9 @@ function renderCategoryFilters(categorias) {
     }
 
     container.innerHTML = `
-        <button class="filtro-categoria ${categoriaAtiva === null ? 'ativo' : ''}" data-slug="">Todos</button>
+        <button class="filtro-categoria ${categoriaAtiva === null ? 'ativo' : ''}" data-slug="" aria-pressed="${categoriaAtiva === null}">Todos</button>
         ${categorias.map(c => `
-            <button class="filtro-categoria ${categoriaAtiva === c.slug ? 'ativo' : ''}" data-slug="${sanitize(c.slug)}">${sanitize(c.name)}</button>
+            <button class="filtro-categoria ${categoriaAtiva === c.slug ? 'ativo' : ''}" data-slug="${sanitize(c.slug)}" aria-pressed="${categoriaAtiva === c.slug}">${sanitize(c.name)}</button>
         `).join('')}
     `;
 
@@ -47,8 +56,12 @@ function renderCategoryFilters(categorias) {
         btn.addEventListener('click', () => {
             categoriaAtiva = btn.dataset.slug || null;
             fetchProducts();
-            document.querySelectorAll('.filtro-categoria').forEach(b => b.classList.remove('ativo'));
+            document.querySelectorAll('.filtro-categoria').forEach(b => {
+                b.classList.remove('ativo');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('ativo');
+            btn.setAttribute('aria-pressed', 'true');
         });
     });
 }
@@ -97,14 +110,14 @@ function renderProducts(products) {
             : '';
 
         const botao = isAffiliate
-            ? `<a class="add-cart-btn" href="${SITE_URL}/go/${sanitize(product.slug || '')}" target="_blank" rel="noopener sponsored">Ver Produto</a>
+            ? `<a class="add-cart-btn" href="${SITE_URL}/go/${sanitize(product.slug || '')}" target="_blank" rel="noopener sponsored" aria-label="Ver ${name} no comerciante externo (link de afiliado)">Ver Produto</a>
                <p class="affiliate-note">🔗 Link de afiliado</p>`
-            : `<button class="add-cart-btn" data-id="${product.id}" data-name="${name}" data-price="${price}">
+            : `<button class="add-cart-btn" data-id="${product.id}" data-name="${name}" data-price="${price}" aria-label="Adicionar ${name} ao carrinho, ${price} euros">
                 Adicionar ao Carrinho
                </button>`;
 
         div.innerHTML = `
-            <a href="produto.html?id=${product.id}" class="product-link">
+            <a href="produto.html?id=${product.id}" class="product-link" aria-label="Ver detalhes de ${name}">
                 <img src="${image}" alt="${name}" onerror="this.src='images/placeholder.jpg'">
                 ${categoryTag}
                 <h2>${name}</h2>
@@ -177,7 +190,7 @@ function renderCart() {
         div.innerHTML = `
             <span>${sanitize(item.name)} x${item.quantity}</span>
             <span>${(item.price * item.quantity).toFixed(2)}€</span>
-            <button data-index="${i}" class="remove-item">Remover</button>
+            <button data-index="${i}" class="remove-item" aria-label="Remover ${sanitize(item.name)} do carrinho">Remover</button>
         `;
         container.appendChild(div);
     });

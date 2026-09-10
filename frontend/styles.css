@@ -285,3 +285,86 @@ footer a:hover { opacity: 0.75; }
         padding: 20px;
     }
 }
+
+/* ── Acessibilidade e Mobile ───────────────────────────────────── */
+
+/* Foco visível forte em todos os elementos interativos */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--destaque);
+    outline-offset: 2px;
+}
+
+/* Tamanho mínimo de toque (44x44px) para todos os botões, conforme WCAG */
+button,
+.add-cart-btn,
+.produto-cta,
+.filtro-categoria {
+    min-height: 44px;
+}
+
+/* Texto de apoio para leitores de ecrã, visualmente escondido */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Menu hamburger para mobile */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--branco);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+@media (max-width: 640px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    nav ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--preto);
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+        z-index: 150;
+    }
+
+    nav ul.aberto {
+        display: flex;
+    }
+
+    header {
+        position: relative;
+    }
+}
+
+/* Aumentar contraste do texto de descrição em ecrãs pequenos */
+@media (max-width: 480px) {
+    .product .desc,
+    .produto-descricao {
+        color: #333333;
+    }
+
+    #search-input {
+        max-width: 100%;
+    }
+}
