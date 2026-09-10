@@ -55,6 +55,7 @@ function renderCategoryFilters(categorias) {
 
 async function fetchProducts() {
     const loading = document.getElementById('loading');
+    if (!loading) return;
     loading.style.display = 'block';
     loading.textContent = 'A carregar produtos...';
     try {
@@ -103,11 +104,13 @@ function renderProducts(products) {
                </button>`;
 
         div.innerHTML = `
-            <img src="${image}" alt="${name}" onerror="this.src='images/placeholder.jpg'">
-            ${categoryTag}
-            <h2>${name}</h2>
-            <p class="desc">${desc}</p>
-            <p class="price">${price}€</p>
+            <a href="produto.html?id=${product.id}" class="product-link">
+                <img src="${image}" alt="${name}" onerror="this.src='images/placeholder.jpg'">
+                ${categoryTag}
+                <h2>${name}</h2>
+                <p class="desc">${desc}</p>
+                <p class="price">${price}€</p>
+            </a>
             ${botao}
         `;
         feed.appendChild(div);
@@ -120,14 +123,17 @@ function renderProducts(products) {
     });
 }
 
-document.getElementById('search-input').addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    const valor = e.target.value.trim();
-    debounceTimer = setTimeout(() => {
-        termoPesquisa = valor;
-        fetchProducts();
-    }, 400);
-});
+const searchInput = document.getElementById('search-input');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        const valor = e.target.value.trim();
+        debounceTimer = setTimeout(() => {
+            termoPesquisa = valor;
+            fetchProducts();
+        }, 400);
+    });
+}
 
 function addToCart(product) {
     const existing = cart.find(i => i.id === product.id);
@@ -146,8 +152,10 @@ function saveCart() {
 }
 
 function updateCartCount() {
+    const el = document.getElementById('cart-count');
+    if (!el) return;
     const count = cart.reduce((acc, i) => acc + i.quantity, 0);
-    document.getElementById('cart-count').textContent = count;
+    el.textContent = count;
 }
 
 function renderCart() {
@@ -186,47 +194,59 @@ function renderCart() {
     });
 }
 
-document.getElementById('nav-carrinho').addEventListener('click', e => {
-    e.preventDefault();
-    renderCart();
-    document.getElementById('cart-modal').classList.remove('hidden');
-});
-document.getElementById('close-cart').addEventListener('click', () => {
-    document.getElementById('cart-modal').classList.add('hidden');
-});
+const navCarrinho = document.getElementById('nav-carrinho');
+if (navCarrinho) {
+    navCarrinho.addEventListener('click', e => {
+        e.preventDefault();
+        renderCart();
+        document.getElementById('cart-modal').classList.remove('hidden');
+    });
+}
 
-document.getElementById('checkout-btn').addEventListener('click', async () => {
-    const token = localStorage.getItem('ella_token');
-    if (!token) {
-        alert('Tens de fazer login para finalizar a compra.');
-        window.location.href = 'login.html';
-        return;
-    }
-    if (cart.length === 0) {
-        alert('O carrinho está vazio.');
-        return;
-    }
+const closeCart = document.getElementById('close-cart');
+if (closeCart) {
+    closeCart.addEventListener('click', () => {
+        document.getElementById('cart-modal').classList.add('hidden');
+    });
+}
 
-    try {
-        const res = await fetch(`${API_URL}/payments/checkout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({
-                items: cart.map(i => ({ product_id: i.id, quantity: i.quantity }))
-            })
-        });
-
-        const data = await res.json();
-        if (res.ok && data.url) {
-            window.location.href = data.url;
-        } else {
-            alert(data.error || 'Erro ao iniciar pagamento');
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('ella_token');
+        if (!token) {
+            alert('Tens de fazer login para finalizar a compra.');
+            window.location.href = 'login.html';
+            return;
         }
-    } catch {
-        alert('Erro de ligação ao servidor');
-    }
-});
+        if (cart.length === 0) {
+            alert('O carrinho está vazio.');
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/payments/checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    items: cart.map(i => ({ product_id: i.id, quantity: i.quantity }))
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.error || 'Erro ao iniciar pagamento');
+            }
+        } catch {
+            alert('Erro de ligação ao servidor');
+        }
+    });
+}
 
 updateCartCount();
-fetchCategories();
-fetchProducts();
+if (document.getElementById('product-feed')) {
+    fetchCategories();
+    fetchProducts();
+}
