@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies - ELLA'S Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">ELLA'S</div>
+        <nav aria-label="Navegação principal">
+            <ul><li><a href="index.html">Voltar à loja</a></li></ul>
+        </nav>
+    </header>
+
+    <main class="legal-container">
+        <h1>Política de Cookies</h1>
+
+        <h2>O que são cookies</h2>
+        <p>Cookies são pequenos ficheiros guardados no teu dispositivo que ajudam o site a funcionar e a entender como é utilizado.</p>
+
+        <h2>Cookies necessários</h2>
+        <p>Usados para funcionalidades essenciais, como manter a tua sessão de login e o carrinho de compras. Não podem ser desativados porque o site não funciona sem eles.</p>
+
+        <h2>Cookies de análise</h2>
+        <p>Ajudam-nos a perceber como os visitantes usam a loja (páginas mais vistas, produtos populares). Só são ativados com o teu consentimento.</p>
+
+        <h2>Cookies de marketing</h2>
+        <p>Usados para medir a eficácia de campanhas em redes sociais e de tracking de cliques em produtos afiliados. Só são ativados com o teu consentimento.</p>
+
+        <h2>Como gerir as tuas preferências</h2>
+        <p>Podes alterar as tuas escolhas a qualquer momento clicando no botão abaixo.</p>
+        <button id="btn-abrir-preferencias-cookies">Gerir preferências de cookies</button>
+
+        <p class="legal-data">Última atualização: [DATA]</p>
+    </main>
+
+    <footer>
+        <p>ELLA'S Store — Todos os direitos reservados</p>
+        <p><a href="privacidade.html">Política de Privacidade</a> |
+           <a href="termos.html">Termos e Condições</a> |
+           <a href="cookies.html">Cookies</a> |
+           <a href="divulgacao-afiliados.html">Divulgação de Afiliados</a></p>
+    </footer>
+
+    <script src="cookies.js"></script>
+    <script>
+        document.getElementById('btn-abrir-preferencias-cookies').addEventListener('click', () => {
+            window.ellaCookieConsent.reset();
+        });
+    </script>
+</body>
+</html>

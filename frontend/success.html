@@ -16,6 +16,15 @@
             <a href="index.html"><button>Continuar a comprar</button></a>
         </div>
     </main>
+
+    <footer>
+        <p>ELLA'S Store — Todos os direitos reservados</p>
+        <p><a href="privacidade.html">Política de Privacidade</a> |
+           <a href="termos.html">Termos e Condições</a> |
+           <a href="cookies.html">Cookies</a> |
+           <a href="divulgacao-afiliados.html">Divulgação de Afiliados</a></p>
+    </footer>
+
     <script>
         localStorage.removeItem('ella_cart');
         const params  = new URLSearchParams(window.location.search);
@@ -24,5 +33,6 @@
             document.getElementById('order-info').textContent = `Número da encomenda: #${orderId}`;
         }
     </script>
+    <script src="cookies.js"></script>
 </body>
 </html>
