@@ -12,6 +12,7 @@ const paymentRoutes   = require('./routes/payments');
 const webhookRoutes   = require('./routes/webhook');
 const goRoutes         = require('./routes/go');
 const categoryRoutes    = require('./routes/categories');
+const analyticsRoutes    = require('./routes/analytics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +48,7 @@ app.use('/api/products',   productRoutes);
 app.use('/api/orders',     orderRoutes);
 app.use('/api/payments',   paymentRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/analytics',  analyticsRoutes);
 app.use('/go', goRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));

@@ -15,6 +15,10 @@
         if (banner) banner.remove();
         const settings = document.getElementById('cookie-settings');
         if (settings) settings.remove();
+
+        if (consent.analytics && window.ellaAnalytics) {
+            window.ellaAnalytics.registarVisita();
+        }
     }
 
     function renderBanner() {
