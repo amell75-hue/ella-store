@@ -13,6 +13,7 @@
             <ul>
                 <li><a href="#" id="tab-produtos">Produtos</a></li>
                 <li><a href="#" id="tab-encomendas">Encomendas</a></li>
+                <li><a href="#" id="tab-estatisticas">Estatísticas</a></li>
                 <li><a href="#" id="btn-logout">Sair</a></li>
             </ul>
         </nav>
@@ -41,7 +42,55 @@
             <h2>Encomendas</h2>
             <div id="lista-encomendas" class="admin-lista"><p>A carregar encomendas...</p></div>
         </section>
+
+        <section id="secao-estatisticas" class="hidden">
+            <h2>Estatísticas</h2>
+            <div id="stats-loading">A carregar estatísticas...</div>
+            <div id="stats-conteudo" class="hidden">
+                <div class="stats-cards">
+                    <div class="stats-card">
+                        <span class="stats-numero" id="stat-visitas">0</span>
+                        <span class="stats-label">Visitas totais</span>
+                    </div>
+                    <div class="stats-card">
+                        <span class="stats-numero" id="stat-cliques">0</span>
+                        <span class="stats-label">Cliques em afiliados</span>
+                    </div>
+                    <div class="stats-card">
+                        <span class="stats-numero" id="stat-encomendas">0</span>
+                        <span class="stats-label">Encomendas pagas</span>
+                    </div>
+                    <div class="stats-card">
+                        <span class="stats-numero" id="stat-receita">0.00€</span>
+                        <span class="stats-label">Receita (produtos próprios)</span>
+                    </div>
+                </div>
+
+                <div class="stats-tabelas">
+                    <div class="stats-bloco">
+                        <h3>Visitas por origem</h3>
+                        <table class="admin-table" id="tabela-origens"></table>
+                    </div>
+                    <div class="stats-bloco">
+                        <h3>Páginas mais vistas</h3>
+                        <table class="admin-table" id="tabela-paginas"></table>
+                    </div>
+                    <div class="stats-bloco">
+                        <h3>Produtos afiliados mais clicados</h3>
+                        <table class="admin-table" id="tabela-produtos-clicados"></table>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <footer>
+        <p>ELLA'S Store — Todos os direitos reservados</p>
+        <p><a href="privacidade.html">Política de Privacidade</a> |
+           <a href="termos.html">Termos e Condições</a> |
+           <a href="cookies.html">Cookies</a> |
+           <a href="divulgacao-afiliados.html">Divulgação de Afiliados</a></p>
+    </footer>
 
     <script>
     const API_URL = window.location.hostname === 'localhost'
@@ -74,17 +123,30 @@
         setTimeout(() => el.classList.add('hidden'), 3000);
     }
 
+    function esconderTodasSecoes() {
+        document.getElementById('secao-produtos').classList.add('hidden');
+        document.getElementById('secao-encomendas').classList.add('hidden');
+        document.getElementById('secao-estatisticas').classList.add('hidden');
+    }
+
     document.getElementById('tab-produtos').addEventListener('click', e => {
         e.preventDefault();
+        esconderTodasSecoes();
         document.getElementById('secao-produtos').classList.remove('hidden');
-        document.getElementById('secao-encomendas').classList.add('hidden');
     });
 
     document.getElementById('tab-encomendas').addEventListener('click', e => {
         e.preventDefault();
-        document.getElementById('secao-produtos').classList.add('hidden');
+        esconderTodasSecoes();
         document.getElementById('secao-encomendas').classList.remove('hidden');
         carregarEncomendas();
+    });
+
+    document.getElementById('tab-estatisticas').addEventListener('click', e => {
+        e.preventDefault();
+        esconderTodasSecoes();
+        document.getElementById('secao-estatisticas').classList.remove('hidden');
+        carregarEstatisticas();
     });
 
     document.getElementById('btn-logout').addEventListener('click', e => {
@@ -269,6 +331,56 @@
                 }
             });
         });
+    }
+
+    async function carregarEstatisticas() {
+        const loading = document.getElementById('stats-loading');
+        const conteudo = document.getElementById('stats-conteudo');
+        loading.classList.remove('hidden');
+        conteudo.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API_URL}/analytics/dashboard`, { headers: authHeaders() });
+            const { data } = await res.json();
+
+            document.getElementById('stat-visitas').textContent = data.totalVisitas;
+            document.getElementById('stat-cliques').textContent = data.totalCliquesAfiliados;
+            document.getElementById('stat-encomendas').textContent = data.totalEncomendas;
+            document.getElementById('stat-receita').textContent = parseFloat(data.receita).toFixed(2) + '€';
+
+            document.getElementById('tabela-origens').innerHTML = tabelaSimples(
+                data.visitasPorOrigem, 'origem', 'Origem', 'total', 'Visitas'
+            );
+            document.getElementById('tabela-paginas').innerHTML = tabelaSimples(
+                data.paginasMaisVistas, 'page_path', 'Página', 'total', 'Visitas'
+            );
+            document.getElementById('tabela-produtos-clicados').innerHTML = tabelaSimples(
+                data.produtosMaisClicados, 'name', 'Produto', 'total', 'Cliques'
+            );
+
+            loading.classList.add('hidden');
+            conteudo.classList.remove('hidden');
+        } catch (error) {
+            loading.textContent = 'Erro ao carregar estatísticas.';
+            console.error(error);
+        }
+    }
+
+    function tabelaSimples(linhas, campoNome, labelNome, campoValor, labelValor) {
+        if (!linhas || linhas.length === 0) {
+            return '<tbody><tr><td>Sem dados ainda.</td></tr></tbody>';
+        }
+        return `
+            <thead><tr><th>${labelNome}</th><th>${labelValor}</th></tr></thead>
+            <tbody>
+                ${linhas.map(l => `
+                    <tr>
+                        <td>${sanitize(l[campoNome])}</td>
+                        <td>${sanitize(l[campoValor])}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        `;
     }
 
     carregarProdutos();

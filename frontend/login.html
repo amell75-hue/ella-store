@@ -9,7 +9,7 @@
 <body>
     <header>
         <div class="logo">ELLA'S</div>
-        <nav><ul><li><a href="index.html">Voltar à loja</a></li></ul></nav>
+        <nav aria-label="Navegação principal"><ul><li><a href="index.html">Voltar à loja</a></li></ul></nav>
     </header>
 
     <main class="auth-container">
@@ -18,21 +18,34 @@
             <div id="auth-error" class="error-msg hidden"></div>
 
             <div id="form-login">
+                <label for="login-email" class="sr-only">Email</label>
                 <input type="email" id="login-email" placeholder="Email" autocomplete="email">
+                <label for="login-password" class="sr-only">Password</label>
                 <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
                 <button id="btn-login">Entrar</button>
                 <p>Não tens conta? <a href="#" id="show-register">Criar conta</a></p>
             </div>
 
             <div id="form-register" class="hidden">
+                <label for="reg-name" class="sr-only">Nome completo</label>
                 <input type="text" id="reg-name" placeholder="Nome completo">
+                <label for="reg-email" class="sr-only">Email</label>
                 <input type="email" id="reg-email" placeholder="Email">
+                <label for="reg-password" class="sr-only">Password</label>
                 <input type="password" id="reg-password" placeholder="Password (mín. 8 caracteres)">
                 <button id="btn-register">Criar Conta</button>
                 <p>Já tens conta? <a href="#" id="show-login">Entrar</a></p>
             </div>
         </div>
     </main>
+
+    <footer>
+        <p>ELLA'S Store — Todos os direitos reservados</p>
+        <p><a href="privacidade.html">Política de Privacidade</a> |
+           <a href="termos.html">Termos e Condições</a> |
+           <a href="cookies.html">Cookies</a> |
+           <a href="divulgacao-afiliados.html">Divulgação de Afiliados</a></p>
+    </footer>
 
     <script>
     const API_URL = window.location.hostname === 'localhost'
@@ -58,6 +71,22 @@
         document.getElementById('auth-error').classList.add('hidden');
     });
 
+    async function fazerLogin(email, password) {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('ella_token', data.token);
+            localStorage.setItem('ella_user',  JSON.stringify(data.user));
+            window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
+        } else {
+            showError(data.error || 'Erro no login');
+        }
+    }
+
     document.getElementById('btn-login').addEventListener('click', async () => {
         const email    = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
@@ -68,19 +97,7 @@
         }
 
         try {
-            const res = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                localStorage.setItem('ella_token', data.token);
-                localStorage.setItem('ella_user',  JSON.stringify(data.user));
-                window.location.href = data.user.role === 'admin' ? 'admin.html' : 'index.html';
-            } else {
-                showError(data.error || 'Erro no login');
-            }
+            await fazerLogin(email, password);
         } catch {
             showError('Erro de ligação ao servidor');
         }
@@ -108,8 +125,9 @@
             });
             const data = await res.json();
             if (res.ok) {
-                alert('Conta criada! Podes fazer login agora.');
-                document.getElementById('show-login').click();
+                // Login automatico depois do registo, sem pedir para o
+                // utilizador escrever tudo outra vez.
+                await fazerLogin(email, password);
             } else {
                 showError(data.error || 'Erro no registo');
             }
@@ -118,7 +136,6 @@
         }
     });
     </script>
-    <script src="analytics.js"></script>
     <script src="cookies.js"></script>
 </body>
 </html>
