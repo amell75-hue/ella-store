@@ -584,3 +584,8 @@ button,
         font-size: 24px;
     }
 }
+
+/* ── Excecao: nome do utilizador no cabecalho nao deve ficar em maiusculas ── */
+#nav-login {
+    text-transform: none;
+}
