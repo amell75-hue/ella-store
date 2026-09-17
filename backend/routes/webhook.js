@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const stripe  = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const db      = require('../db');
+const { enviarConfirmacaoEncomenda } = require('../services/email');
 
 router.post('/',
     express.raw({ type: 'application/json' }),
@@ -30,8 +31,25 @@ router.post('/',
                     ['paid', orderId]
                 );
                 console.log(`Encomenda #${orderId} paga com sucesso`);
+
+                // Buscar dados para o email de confirmacao
+                const [rows] = await db.query(
+                    `SELECT o.id, o.total, u.email
+                     FROM orders o
+                     JOIN users u ON o.user_id = u.id
+                     WHERE o.id = ?`,
+                    [orderId]
+                );
+
+                if (rows.length > 0) {
+                    const encomenda = rows[0];
+                    await enviarConfirmacaoEncomenda(encomenda.email, {
+                        orderId: encomenda.id,
+                        total: parseFloat(encomenda.total).toFixed(2)
+                    });
+                }
             } catch (err) {
-                console.error('Erro ao atualizar encomenda:', err);
+                console.error('Erro ao atualizar encomenda ou enviar email:', err);
             }
         }
 
